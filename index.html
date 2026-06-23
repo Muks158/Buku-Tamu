@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>Buku Tamu Digital PA Bengkalis</title>
+  <!-- Tailwind CSS via Play CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            paGreen: {
+              50: '#e8f5e9',
+              100: '#c8e6c9',
+              800: '#1b5e20', // Warna utama Mahkamah Agung RI
+              900: '#113e14',
+            },
+            paGold: {
+              500: '#d4af37', // Emas elegan
+              600: '#b8942b',
+              700: '#9d7c20',
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Transisi Custom */
+    .tab-content {
+      transition: all 0.25s ease-in-out;
+    }
+    /* Sembunyikan scrollbar bawaan */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1b5e20;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #113e14;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col">
+
+  <!-- Header Branding Bar -->
+  <header class="bg-gradient-to-r from-paGreen-900 via-paGreen-800 to-emerald-950 text-white shadow-xl sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-4">
+        <!-- Logo Representasi PA Bengkalis -->
+        <div class="relative flex-shrink-0 bg-white p-2 rounded-full border-2 border-paGold-500 shadow-md">
+          <svg class="w-12 h-12 text-paGreen-800" fill="currentColor" viewBox="0 0 24 24">
+            <!-- Representasi Timbangan Keadilan / Hukum -->
+            <path d="M12 2c-.55 0-1 .45-1 1v1.07C7.33 4.54 4.54 7.33 4.07 11H3c-.55 0-1 .45-1 1s.45 1 1 1h1.07c.47 3.67 3.26 6.46 6.93 6.93V21c0 .55.45 1 1 1s1-.45 1-1v-1.07c3.67-.47 6.46-3.26 6.93-6.93H21c.55 0 1-.45 1-1s-.45-1-1-1h-1.07c-.47-3.67-3.26-6.46-6.93-6.93V3c0-.55-.45-1-1-1zm-6 10c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6zm6-4c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4z"/>
+          </svg>
+        </div>
+        <div class="text-center md:text-left">
+          <h1 class="text-xl sm:text-2xl font-black tracking-wide flex items-center justify-center md:justify-start">
+            SITAMU <span class="text-paGold-500 ml-2 font-light">DIGITAL</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-emerald-100 font-medium tracking-wider uppercase">
+            Pengadilan Agama Bengkalis Kelas II
+          </p>
+        </div>
+      </div>
+      
+      <!-- Menu Navigasi Modern -->
+      <div class="flex items-center space-x-2 w-full md:w-auto justify-center">
+        <nav class="flex space-x-1 sm:space-x-2 bg-emerald-950/50 p-1.5 rounded-xl border border-white/10 overflow-x-auto">
+          <button onclick="pindahTab('dashboard')" id="btn-dashboard" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-paGold-500 text-paGreen-900 shadow">
+            <i class="fa-solid fa-chart-line"></i>
+            <span>Dashboard</span>
+          </button>
+          <button onclick="pindahTab('input')" id="btn-input" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 hover:bg-white/10 transition-all duration-200">
+            <i class="fa-solid fa-user-plus"></i>
+            <span>Isi Buku Tamu</span>
+          </button>
+          <button onclick="pindahTab('rekap')" id="btn-rekap" class="flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 hover:bg-white/10 transition-all duration-200">
+            <i class="fa-solid fa-book-open"></i>
+            <span>Rekap Data</span>
+          </button>
+        </nav>
+        
+        <!-- Tombol Pengaturan Integrasi API -->
+        <button onclick="bukaModalPengaturan()" class="p-2.5 bg-emerald-950 hover:bg-emerald-900 text-paGold-500 rounded-xl border border-white/10 shadow transition" title="Pengaturan Koneksi API Database">
+          <i class="fa-solid fa-gears text-lg"></i>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Banner Status Koneksi GitHub Pages ke Google Sheets -->
+  <div id="banner-api-warning" class="bg-amber-500 text-slate-900 text-center py-2 px-4 text-xs font-bold shadow-inner hidden">
+    <i class="fa-solid fa-triangle-exclamation mr-1.5"></i>
+    Aplikasi berjalan dalam Mode Simulasi (Demo). Silakan hubungkan dengan URL Web App Apps Script Anda melalui tombol <i class="fa-solid fa-gears mx-0.5"></i> di kanan atas.
+  </div>
+
+  <!-- Main Container -->
+  <main class="flex-grow max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8 w-full">
+    
+    <!-- ================== TAB 1: DASHBOARD ================== -->
+    <section id="tab-dashboard" class="tab-content block space-y-8">
+      <!-- Welcome Banner -->
+      <div class="bg-gradient-to-br from-paGreen-800 to-emerald-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl relative overflow-hidden">
+        <div class="absolute -right-16 -bottom-16 w-64 h-64 bg-white/5 rounded-full blur-2xl"></div>
+        <div class="absolute -left-10 -top-10 w-48 h-48 bg-paGold-500/10 rounded-full blur-xl"></div>
+        <div class="relative z-10 max-w-2xl space-y-2">
+          <span class="bg-paGold-500/20 text-paGold-500 font-bold text-xs uppercase px-3 py-1 rounded-full border border-paGold-500/30 tracking-widest inline-block">
+            Sistem Informasi Tamu Terintegrasi
+          </span>
+          <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight">
+            Selamat Datang di Pengadilan Agama Bengkalis
+          </h2>
+          <p class="text-sm sm:text-base text-emerald-100 leading-relaxed font-light">
+            Silakan gunakan sistem digital terintegrasi ini untuk mendata setiap tamu dinas maupun pencari keadilan dengan praktis, aman, dan transparan.
+          </p>
+        </div>
+      </div>
+
+      <!-- Quick Stats Card -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between transition hover:shadow-md">
+          <div class="space-y-1">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Total Kunjungan Keseluruhan</span>
+            <p id="stat-total" class="text-4xl font-black text-paGreen-800">0</p>
+          </div>
+          <div class="p-4 bg-emerald-50 rounded-2xl text-paGreen-800">
+            <i class="fa-solid fa-users text-3xl"></i>
+          </div>
+        </div>
+        
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between transition hover:shadow-md">
+          <div class="space-y-1">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Tamu Hari Ini</span>
+            <p id="stat-hari-ini" class="text-4xl font-black text-amber-600">0</p>
+          </div>
+          <div class="p-4 bg-amber-50 rounded-2xl text-amber-600">
+            <i class="fa-solid fa-calendar-day text-3xl"></i>
+          </div>
+        </div>
+
+        <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between sm:col-span-2 lg:col-span-1 transition hover:shadow-md">
+          <div class="space-y-1">
+            <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Koneksi Database</span>
+            <div class="flex items-center space-x-2 pt-2">
+              <span class="flex h-3 w-3 relative">
+                <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+              </span>
+              <span id="label-status-koneksi" class="text-lg font-bold text-slate-700">Terhubung</span>
+            </div>
+          </div>
+          <div class="p-4 bg-blue-50 rounded-2xl text-blue-600">
+            <i class="fa-solid fa-server text-3xl"></i>
+          </div>
+        </div>
+      </div>
+
+      <!-- Category Statistics Charts -->
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+        <div class="flex items-center justify-between border-b pb-4">
+          <h3 class="text-lg font-bold text-slate-800 flex items-center">
+            <i class="fa-solid fa-chart-pie text-paGreen-800 mr-2"></i>
+            Statistik Kedatangan Berdasarkan Kategori
+          </h3>
+          <span class="text-xs text-slate-400 font-medium">Update otomatis setiap penambahan data</span>
+        </div>
+        <div id="container-stat-kategori" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
+          <!-- Diisi via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ================== TAB 2: FORM INPUT TAMU ================== -->
+    <section id="tab-input" class="tab-content hidden max-w-4xl mx-auto">
+      <div class="bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden">
+        <div class="bg-gradient-to-r from-paGreen-800 to-emerald-900 px-6 py-6 text-white flex justify-between items-center">
+          <div>
+            <h2 class="text-xl font-bold tracking-tight">Formulir Pendaftaran Tamu</h2>
+            <p class="text-xs text-emerald-100 font-light mt-1">Lengkapi seluruh kolom dengan informasi valid sebelum masuk</p>
+          </div>
+          <i class="fa-solid fa-id-card-clip text-3xl text-paGold-500/80"></i>
+        </div>
+
+        <form id="guestForm" onsubmit="handleFormSubmit(event)" class="p-6 sm:p-8 space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Kolom Nama -->
+            <div class="space-y-1.5">
+              <label class="block text-sm font-semibold text-slate-700">Nama Lengkap Pengunjung <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                  <i class="fa-solid fa-user"></i>
+                </span>
+                <input type="text" id="nama" required placeholder="Masukkan nama lengkap" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-paGreen-800 focus:bg-white transition duration-200">
+              </div>
+            </div>
+
+            <!-- Kolom Nomor HP -->
+            <div class="space-y-1.5">
+              <label class="block text-sm font-semibold text-slate-700">Nomor WhatsApp / HP <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                  <i class="fa-solid fa-phone"></i>
+                </span>
+                <input type="tel" id="noHp" required placeholder="Contoh: 081234567890" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-paGreen-800 focus:bg-white transition duration-200">
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Kolom Asal Tamu -->
+            <div class="space-y-1.5">
+              <label class="block text-sm font-semibold text-slate-700">Asal Tamu / Instansi / Alamat <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                  <i class="fa-solid fa-map-location-dot"></i>
+                </span>
+                <input type="text" id="asalTamu" required placeholder="Contoh: Instansi A / Pekanbaru / Bengkalis" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-paGreen-800 focus:bg-white transition duration-200">
+              </div>
+            </div>
+
+            <!-- Kolom Keperluan -->
+            <div class="space-y-1.5">
+              <label class="block text-sm font-semibold text-slate-700">Keperluan / Tujuan <span class="text-red-500">*</span></label>
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                  <i class="fa-solid fa-pen-to-square"></i>
+                </span>
+                <input type="text" id="keperluan" required placeholder="Contoh: Konsultasi / Sidang / Pengambilan Akta" class="w-full pl-10 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 placeholder-slate-400 font-medium focus:outline-none focus:ring-2 focus:ring-paGreen-800 focus:bg-white transition duration-200">
+              </div>
+            </div>
+          </div>
+
+          <!-- Kategori Pengunjung Dropdown -->
+          <div class="space-y-1.5">
+            <label class="block text-sm font-semibold text-slate-700">Kategori Pengunjung <span class="text-red-500">*</span></label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-400">
+                <i class="fa-solid fa-users-viewfinder"></i>
+              </span>
+              <select id="kategori" onchange="prosesKategori(this.value)" required class="w-full pl-10 pr-10 py-3 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium focus:outline-none focus:ring-2 focus:ring-paGreen-800 focus:bg-white transition duration-200 appearance-none">
+                <option value="" disabled selected>-- Pilih Kategori Pengunjung --</option>
+                <option value="Pihak Berperkara">Pihak Berperkara</option>
+                <option value="Kuasa Hukum">Kuasa Hukum</option>
+                <option value="Saksi">Saksi</option>
+                <option value="Pencari Informasi">Pencari Informasi</option>
+                <option value="Pengambilan Produk PA">Pengambilan Produk PA</option>
+                <option value="Tamu">Tamu Dinas / Instansi</option>
+                <option value="Lainnya">Lainnya...</option>
+              </select>
+              <span class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 pointer-events-none">
+                <i class="fa-solid fa-chevron-down"></i>
+              </span>
+            </div>
+          </div>
+
+          <!-- Dynamic Container: Pegawai yang Dikunjungi jika memilih "Tamu" -->
+          <div id="container-pegawai" class="hidden bg-emerald-50/50 p-5 rounded-2xl border border-emerald-100/80 animate-fade-in space-y-3">
+            <label class="block text-sm font-bold text-paGreen-800 flex items-center">
+              <i class="fa-solid fa-user-tie mr-1.5"></i>
+              Silakan Pilih Pejabat / Pegawai Yang Dikunjungi:
+            </label>
+            <div class="overflow-x-auto rounded-xl border border-slate-200/60 bg-white">
+              <table class="min-w-full divide-y divide-slate-100 text-sm">
+                <thead class="bg-slate-50 text-slate-600 font-semibold">
+                  <tr>
+                    <th class="px-4 py-2 text-left w-12">Pilih</th>
+                    <th class="px-4 py-2 text-left">Jabatan</th>
+                    <th class="px-4 py-2 text-left">Rentang Klasifikasi</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100 text-slate-700 font-medium">
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Ketua Pengadilan Agama" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Ketua Pengadilan Agama</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Pimpinan Utama</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Wakil Ketua" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Wakil Ketua</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Wakil Pimpinan</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Hakim-Hakim" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Majelis Hakim</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Kepaniteraan (Teknis)</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Panitera" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Panitera</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Kepaniteraan</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Sekretaris" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Sekretaris</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Kesekretariatan</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Bagian Kepegawaian & ORTALA" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Kasubbag Kepegawaian & ORTALA</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Administrasi SDM</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Bagian Umum & Keuangan" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Kasubbag Umum & Keuangan</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Administrasi Umum</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Bagian Perencanaan, TI & Pelaporan" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Kasubbag PTIP</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Sistem Informasi / TI</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Panitera Muda Gugatan" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Panmud Gugatan</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Kepaniteraan Perdata Gugatan</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Panitera Muda Permohonan" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Panmud Permohonan</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Kepaniteraan Perdata Permohonan</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Panitera Muda Hukum" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Panmud Hukum</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Layanan Hukum & Informasi</td>
+                  </tr>
+                  <tr>
+                    <td class="px-4 py-3 text-center">
+                      <input type="radio" name="pegawai_tujuan" value="Petugas Layanan Informasi / PTSP" class="w-4 h-4 text-paGreen-800 focus:ring-paGreen-800">
+                    </td>
+                    <td class="px-4 py-3 text-slate-900">Petugas PTSP Utama</td>
+                    <td class="px-4 py-3 text-xs text-slate-500">Front Office</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- MODUL WEBCAM & AMBIL FOTO -->
+          <div class="space-y-3">
+            <label class="block text-sm font-semibold text-slate-700">Foto Pengunjung <span class="text-red-500">*</span></label>
+            <div class="bg-slate-50 border-2 border-dashed border-slate-200 rounded-3xl p-6 flex flex-col items-center justify-center space-y-4">
+              <!-- Frame Viewfinder Kamera -->
+              <div class="relative w-72 h-54 bg-black rounded-2xl overflow-hidden shadow-inner flex items-center justify-center border-2 border-slate-200">
+                <video id="videoElement" autoplay playsinline class="w-full h-full object-cover hidden" style="transform: scaleX(-1);"></video>
+                <canvas id="canvasElement" class="hidden"></canvas>
+                <img id="imagePreview" src="https://placehold.co/640x480?text=Kamera+Belum+Aktif" class="w-full h-full object-cover">
+                
+                <!-- Indikator Berhasil Foto -->
+                <div id="check-icon-success" class="absolute inset-0 bg-paGreen-800/80 hidden flex-col items-center justify-center text-white space-y-1">
+                  <i class="fa-solid fa-circle-check text-5xl text-paGold-500"></i>
+                  <span class="text-xs font-bold uppercase tracking-wider">Foto Terpilih</span>
+                </div>
+              </div>
+
+              <!-- Kontrol Tombol Kamera -->
+              <div class="flex flex-wrap gap-3 justify-center">
+                <button type="button" id="btn-start-camera" onclick="startWebcam()" class="px-4 py-2 bg-slate-700 hover:bg-slate-800 text-white font-semibold text-xs rounded-xl flex items-center space-x-2 transition">
+                  <i class="fa-solid fa-camera"></i>
+                  <span>Aktifkan Kamera</span>
+                </button>
+                <button type="button" id="btn-snap" onclick="takeSnapshot()" class="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white font-semibold text-xs rounded-xl flex items-center space-x-2 transition hidden">
+                  <i class="fa-solid fa-circle-dot"></i>
+                  <span>Ambil Foto</span>
+                </button>
+                <button type="button" id="btn-retake" onclick="ulangFoto()" class="px-4 py-2 bg-slate-500 hover:bg-slate-600 text-white font-semibold text-xs rounded-xl flex items-center space-x-2 transition hidden">
+                  <i class="fa-solid fa-arrows-rotate"></i>
+                  <span>Foto Ulang</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tombol Kirim / Submit -->
+          <div class="pt-4">
+            <button type="submit" id="btn-submit" class="w-full bg-paGreen-800 hover:bg-paGreen-900 text-white py-4 rounded-2xl font-bold tracking-wide transition shadow-lg flex items-center justify-center space-x-2 text-base">
+              <span id="submit-text"><i class="fa-solid fa-paper-plane mr-2"></i>Simpan & Daftarkan Kehadiran</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ================== TAB 3: REKAPITULASI DATA TAMU ================== -->
+    <section id="tab-rekap" class="tab-content hidden space-y-6">
+      <div class="bg-white p-6 rounded-3xl shadow-sm border border-slate-100 space-y-6">
+        
+        <!-- Header Rekap & Fitur Download -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 pb-4 border-b">
+          <div>
+            <h3 class="text-xl font-extrabold text-slate-800">
+              Riwayat Kunjungan Pengunjung
+            </h3>
+            <p class="text-xs text-slate-400 font-medium">Rekapitulasi data real-time dari Google Sheet</p>
+          </div>
+          
+          <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+            <button onclick="downloadFormatCSV()" class="flex-grow sm:flex-grow-0 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2.5 rounded-xl font-bold text-sm shadow flex items-center justify-center space-x-2 transition">
+              <i class="fa-solid fa-file-csv"></i>
+              <span>Download Rekap (CSV)</span>
+            </button>
+            <button onclick="ambilDataTerbaru()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2.5 rounded-xl font-bold text-sm flex items-center justify-center space-x-2 transition">
+              <i class="fa-solid fa-arrows-rotate"></i>
+              <span>Refresh</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Pencarian -->
+        <div class="relative max-w-md">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+            <i class="fa-solid fa-magnifying-glass"></i>
+          </span>
+          <input type="text" id="pencarianTamu" oninput="filterDataTamu(this.value)" placeholder="Cari nama atau nomor HP..." class="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-paGreen-800 focus:bg-white transition duration-200">
+        </div>
+
+        <!-- Table Desktop View -->
+        <div class="overflow-x-auto rounded-2xl border border-slate-100 shadow-sm">
+          <table class="min-w-full divide-y divide-slate-100 text-sm">
+            <thead class="bg-slate-50/80 text-slate-600 font-bold">
+              <tr>
+                <th class="px-6 py-4 text-left tracking-wider">Tanggal & Waktu</th>
+                <th class="px-6 py-4 text-left tracking-wider">Nama Pengunjung</th>
+                <th class="px-6 py-4 text-left tracking-wider">Kategori</th>
+                <th class="px-6 py-4 text-left tracking-wider">Asal Tamu / Instansi</th>
+                <th class="px-6 py-4 text-left tracking-wider">Keperluan</th>
+                <th class="px-6 py-4 text-left tracking-wider">Pegawai Dituju</th>
+                <th class="px-6 py-4 text-left tracking-wider">Nomor HP</th>
+                <th class="px-6 py-4 text-center tracking-wider">Foto Dokumen</th>
+              </tr>
+            </thead>
+            <tbody id="tabel-rekap-body" class="divide-y divide-slate-100 text-slate-700 font-medium">
+              <!-- Diisi via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- MODAL PENGATURAN API DATABASE -->
+  <div id="modal-pengaturan" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden border border-slate-100 transform scale-95 transition-all">
+      <div class="bg-gradient-to-r from-paGreen-800 to-emerald-900 p-6 text-white flex justify-between items-center">
+        <div>
+          <h3 class="text-lg font-bold">Pengaturan Koneksi API</h3>
+          <p class="text-xs text-emerald-100 font-light mt-0.5">Integrasikan GitHub Pages dengan Google Sheets Anda</p>
+        </div>
+        <button onclick="tutupModalPengaturan()" class="text-white/80 hover:text-white transition">
+          <i class="fa-solid fa-xmark text-xl"></i>
+        </button>
+      </div>
+      <div class="p-6 space-y-4">
+        <p class="text-xs text-slate-500 leading-relaxed font-medium">
+          Jika Anda menggunakan aplikasi ini di luar Google Apps Script (misal dari <strong>GitHub Pages</strong>), silakan masukkan <strong>Web App URL</strong> yang Anda dapatkan saat melakukan Deploy di Google Apps Script ke dalam kolom berikut:
+        </p>
+        <div class="space-y-1.5">
+          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider">URL Web App Google Apps Script</label>
+          <input type="url" id="input-api-url" placeholder="https://script.google.com/macros/s/.../exec" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium focus:outline-none focus:ring-2 focus:ring-paGreen-800">
+        </div>
+        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-[11px] text-blue-700 leading-relaxed">
+          <i class="fa-solid fa-circle-info mr-1"></i>
+          URL ini akan disimpan di memori lokal (localStorage) browser perangkat ini, sehingga tidak perlu diatur berulang kali.
+        </div>
+      </div>
+      <div class="bg-slate-50 px-6 py-4 flex justify-end space-x-2">
+        <button onclick="hapusKonfigurasiAPI()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl font-bold text-xs hover:bg-slate-100 transition">
+          Hapus Hubungan
+        </button>
+        <button onclick="simpanKonfigurasiAPI()" class="px-5 py-2.5 bg-paGreen-800 hover:bg-paGreen-900 text-white rounded-xl font-bold text-xs shadow transition">
+          Simpan & Hubungkan
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="notif-toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none max-w-sm w-full bg-white rounded-2xl shadow-xl border border-slate-100 p-4 flex items-start space-x-3">
+    <div id="toast-icon-bg" class="p-2.5 rounded-xl text-white">
+      <i id="toast-icon" class="fa-solid"></i>
+    </div>
+    <div class="flex-grow pt-0.5">
+      <h4 id="toast-title" class="font-bold text-slate-800 text-sm">Sistem Informasi</h4>
+      <p id="toast-msg" class="text-xs text-slate-500 font-medium mt-0.5"></p>
+    </div>
+  </div>
+
+  <footer class="bg-slate-900 text-slate-500 text-center py-4 text-xs font-semibold border-t border-slate-800">
+    &copy; 2026 Pengadilan Agama Bengkalis. All Rights Reserved. IT Team PA Bengkalis.
+  </footer>
+
+  <!-- CLIENT-SIDE LOGIC -->
+  <script>
+    // ====================================================================
+    // MOCKING LAYER UNTUK LINGKUNGAN PREVIEW (CANVAS/LOKAL)
+    // ====================================================================
+    const mockDatabase = {
+      success: true,
+      totalTamu: 142,
+      tamuHariIni: 8,
+      statsKategori: {
+        "Pihak Berperkara": 65,
+        "Kuasa Hukum": 22,
+        "Saksi": 18,
+        "Pencari Informasi": 15,
+        "Pengambilan Produk PA": 12,
+        "Tamu Dinas": 7,
+        "Lainnya": 3
+      },
+      daftarTamu: [
+        { waktu: "23-06-2026 14:15:32", nama: "Supriadi", kategori: "Pihak Berperkara", asalTamu: "Bengkalis Kota", keperluan: "Menghadiri Persidangan", pegawaiDituju: "-", noHp: "081266778899", fotoUrl: "https://placehold.co/640x480?text=Foto+Supriadi" },
+        { waktu: "23-06-2026 11:24:05", nama: "Drs. H. M. Yusuf, M.H.", kategori: "Tamu", asalTamu: "PTA Pekanbaru", keperluan: "Kunjungan Koordinasi Kerja", pegawaiDituju: "Ketua Pengadilan Agama", noHp: "081122334455", fotoUrl: "https://placehold.co/640x480?text=Foto+Tamu+Dinas" },
+        { waktu: "23-06-2026 10:05:11", nama: "Rahmat Hidayat, S.H.", kategori: "Kuasa Hukum", asalTamu: "LBH Lancang Kuning", keperluan: "Pendaftaran Kuasa Berkas", pegawaiDituju: "-", noHp: "085299001122", fotoUrl: "https://placehold.co/640x480?text=Foto+Kuasa+Hukum" },
+        { waktu: "23-06-2026 09:12:44", nama: "Siti Rahmah", kategori: "Pengambilan Produk PA", asalTamu: "Kecamatan Bukit Batu", keperluan: "Pengambilan Akta Cerai Mandiri", pegawaiDituju: "-", noHp: "081377889900", fotoUrl: "https://placehold.co/640x480?text=Foto+Siti+Rahmah" },
+        { waktu: "22-06-2026 15:30:21", nama: "Budi Setiawan", kategori: "Saksi", asalTamu: "Kecamatan Bantan", keperluan: "Saksi Persidangan Gugatan", pegawaiDituju: "-", noHp: "082155667788", fotoUrl: "https://placehold.co/640x480?text=Foto+Budi" }
+      ]
+    };
+
+    let activeStream = null;
+    let base64PhotoData = "";
+    let dataCache = [];
+
+    document.addEventListener("DOMContentLoaded", function() {
+      // Periksa konfigurasi API pada memori lokal browser
+      cekKonfigurasiAPIOnLoad();
+      
+      // Ambil data pertama kali
+      ambilDataTerbaru();
+    });
+
+    /**
+     * Berpindah tab pada Aplikasi Single Page (SPA)
+     */
+    function pindahTab(tabId) {
+      if (tabId !== 'input') {
+        stopWebcam();
+      }
+
+      document.querySelectorAll('.tab-content').forEach(function(section) {
+        if (section.id === 'tab-' + tabId) {
+          section.classList.remove('hidden');
+          section.classList.add('block');
+        } else {
+          section.classList.remove('block');
+          section.classList.add('hidden');
+        }
+      });
+
+      const navIds = ['dashboard', 'input', 'rekap'];
+      const icons = { 'dashboard': 'fa-chart-line', 'input': 'fa-user-plus', 'rekap': 'fa-book-open' };
+      const labels = { 'dashboard': 'Dashboard', 'input': 'Isi Buku Tamu', 'rekap': 'Rekap Data' };
+      
+      navIds.forEach(function(id) {
+        const btn = document.getElementById('btn-' + id);
+        if (id === tabId) {
+          btn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-200 bg-paGold-500 text-paGreen-900 shadow";
+          btn.innerHTML = `<i class="fa-solid ${icons[id]}"></i><span>${labels[id]}</span>`;
+        } else {
+          btn.className = "flex items-center space-x-2 px-4 py-2 rounded-lg text-sm font-medium text-emerald-100 hover:bg-white/10 transition-all duration-200";
+          btn.innerHTML = `<i class="fa-solid ${icons[id]}"></i><span>${labels[id]}</span>`;
+        }
+      });
+    }
+
+    /**
+     * Logic Dynamic Input jika memilih Kategori: "Tamu"
+     */
+    function prosesKategori(nilai) {
+      const elPegawai = document.getElementById('container-pegawai');
+      const radioPegawai = document.getElementsByName('pegawai_tujuan');
+      
+      if (nilai === 'Tamu') {
+        elPegawai.classList.remove('hidden');
+        radioPegawai.forEach(radio => radio.required = true);
+      } else {
+        elPegawai.classList.add('hidden');
+        radioPegawai.forEach(radio => {
+          radio.required = false;
+          radio.checked = false;
+        });
+      }
+    }
+
+    // ==========================================
+    // LOGIC ROUTING KOMUNIKASI BACKEND (HYBRID: GOOGLE & EXTERNAL FETCH)
+    // ==========================================
+    function callBackendAPI(action, payload, successCallback, failureCallback) {
+      // Cek apakah aplikasi berjalan langsung di server Google Apps Script (HTMLService)
+      const runsInGoogleScript = typeof google !== 'undefined' && google.script && google.script.run;
+      const savedApiUrl = localStorage.getItem('gas_web_app_url');
+
+      if (runsInGoogleScript && !savedApiUrl) {
+        // Mode 1: Berjalan langsung di dalam Google Apps Script (Standard google.script.run)
+        if (action === "getStatistikDanRekap") {
+          google.script.run.withSuccessHandler(successCallback).withFailureHandler(failureCallback).getStatistikDanRekap();
+        } else if (action === "simpanDataTamu") {
+          google.script.run.withSuccessHandler(successCallback).withFailureHandler(failureCallback).simpanDataTamu(payload);
+        }
+      } else if (savedApiUrl) {
+        // Mode 2: GitHub Pages terhubung dengan API Google Apps Script (Fetch API CORS)
+        fetch(savedApiUrl, {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=utf-8"
+          },
+          body: JSON.stringify({ action: action, data: payload })
+        })
+        .then(response => {
+          if (!response.ok) throw new Error("HTTP error " + response.status);
+          return response.json();
+        })
+        .then(data => successCallback(data))
+        .catch(err => {
+          console.error("API Connection Error:", err);
+          failureCallback("Hubungan ke Google Sheets terganggu. Silakan cek ulang Web App URL Anda atau koneksi internet.");
+        });
+      } else {
+        // Mode 3: Mode Demo / Simulasi Canvas jika tidak ada konfigurasi API
+        console.warn("Menggunakan Mode Simulasi (Demo Data).");
+        if (action === "getStatistikDanRekap") {
+          setTimeout(() => successCallback(mockDatabase), 200);
+        } else if (action === "simpanDataTamu") {
+          setTimeout(() => {
+            const now = new Date();
+            const formattedDate = String(now.getDate()).padStart(2, '0') + "-" + String(now.getMonth() + 1).padStart(2, '0') + "-" + now.getFullYear() + " " + String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0') + ":" + String(now.getSeconds()).padStart(2, '0');
+            mockDatabase.daftarTamu.unshift({
+              waktu: formattedDate,
+              nama: payload.nama,
+              kategori: payload.kategori,
+              asalTamu: payload.asalTamu,
+              keperluan: payload.keperluan,
+              pegawaiDituju: payload.pegawai,
+              noHp: payload.noHp,
+              fotoUrl: payload.foto || "https://placehold.co/640x480?text=Foto+Demo"
+            });
+            mockDatabase.totalTamu++;
+            mockDatabase.tamuHariIni++;
+            successCallback({ success: true, message: "Berhasil disimpan ke Database Simulasi (Mode Demo)!" });
+          }, 400);
+        }
+      }
+    }
+
+    // ==========================================
+    // LOGIC MODAL & PENGATURAN KONEKSI API
+    // ==========================================
+    function bukaModalPengaturan() {
+      const modal = document.getElementById('modal-pengaturan');
+      const input = document.getElementById('input-api-url');
+      input.value = localStorage.getItem('gas_web_app_url') || "";
+      modal.classList.remove('hidden');
+    }
+
+    function tutupModalPengaturan() {
+      document.getElementById('modal-pengaturan').classList.add('hidden');
+    }
+
+    function simpanKonfigurasiAPI() {
+      const inputUrl = document.getElementById('input-api-url').value.trim();
+      if (inputUrl === "") {
+        showNotification("Gagal", "URL tidak boleh kosong. Gunakan fitur 'Hapus Hubungan' untuk membersihkan konfigurasi.", "error");
+        return;
+      }
+      
+      localStorage.setItem('gas_web_app_url', inputUrl);
+      tutupModalPengaturan();
+      showNotification("Berhasil Terhubung", "Konfigurasi URL Google Apps Script disimpan. Memuat ulang data...", "success");
+      cekKonfigurasiAPIOnLoad();
+      ambilDataTerbaru();
+    }
+
+    function hapusKonfigurasiAPI() {
+      localStorage.removeItem('gas_web_app_url');
+      document.getElementById('input-api-url').value = "";
+      tutupModalPengaturan();
+      showNotification("Hubungan Dihapus", "Aplikasi beralih kembali ke Mode Simulasi / Google Script bawaan.", "success");
+      cekKonfigurasiAPIOnLoad();
+      ambilDataTerbaru();
+    }
+
+    function cekKonfigurasiAPIOnLoad() {
+      const savedApiUrl = localStorage.getItem('gas_web_app_url');
+      const warningBanner = document.getElementById('banner-api-warning');
+      const labelKoneksi = document.getElementById('label-status-koneksi');
+
+      const runsInGoogleScript = typeof google !== 'undefined' && google.script && google.script.run;
+
+      if (savedApiUrl) {
+        warningBanner.classList.add('hidden');
+        labelKoneksi.innerText = "Terhubung (API)";
+        labelKoneksi.className = "text-lg font-bold text-emerald-600";
+      } else if (runsInGoogleScript) {
+        warningBanner.classList.add('hidden');
+        labelKoneksi.innerText = "Terhubung (GAS)";
+        labelKoneksi.className = "text-lg font-bold text-emerald-600";
+      } else {
+        warningBanner.classList.remove('hidden');
+        labelKoneksi.innerText = "Simulasi (Demo)";
+        labelKoneksi.className = "text-lg font-bold text-amber-500";
+      }
+    }
+
+    // ==========================================
+    // LOGIC MODUL WEBCAM HTML5
+    // ==========================================
+    async function startWebcam() {
+      const video = document.getElementById('videoElement');
+      const preview = document.getElementById('imagePreview');
+      const btnStart = document.getElementById('btn-start-camera');
+      const btnSnap = document.getElementById('btn-snap');
+      const btnRetake = document.getElementById('btn-retake');
+      const checkIcon = document.getElementById('check-icon-success');
+
+      btnStart.disabled = true;
+      btnStart.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-1"></i>Memulai...`;
+
+      const constraints = {
+        video: {
+          width: { ideal: 640 },
+          height: { ideal: 480 },
+          facingMode: "user"
+        },
+        audio: false
+      };
+
+      try {
+        stopWebcam();
+
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+          activeStream = await navigator.mediaDevices.getUserMedia(constraints);
+        } else {
+          const getUserMediaFallback = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia || navigator.msGetUserMedia;
+          if (getUserMediaFallback) {
+            activeStream = await new Promise((resolve, reject) => {
+              getUserMediaFallback.call(navigator, constraints, resolve, reject);
+            });
+          } else {
+            throw new Error("Browser tidak mendukung penangkapan kamera langsung.");
+          }
+        }
+        
+        if ('srcObject' in video) {
+          video.srcObject = activeStream;
+        } else {
+          video.src = window.URL.createObjectURL(activeStream);
+        }
+        
+        video.onloadedmetadata = function() {
+          video.play();
+          video.classList.remove('hidden');
+          preview.classList.add('hidden');
+          checkIcon.classList.add('hidden');
+          
+          btnStart.disabled = false;
+          btnStart.classList.add('hidden');
+          btnSnap.classList.remove('hidden');
+          btnRetake.classList.add('hidden');
+        };
+
+      } catch (err) {
+        btnStart.disabled = false;
+        btnStart.innerHTML = `<i class="fa-solid fa-camera mr-1"></i>Aktifkan Kamera`;
+        
+        let detailError = "Periksa perizinan kamera pada browser Anda.";
+        if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+          detailError = "Akses ditolak. Silakan berikan izin akses kamera pada alamat URL peramban Anda kemudian muat ulang.";
+        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+          detailError = "Hardware modul kamera tidak terdeteksi pada perangkat komputer ini.";
+        }
+        
+        showNotification("Kamera Gagal Dimulai", detailError, "error");
+        console.error("Camera Error Log: ", err);
+      }
+    }
+
+    function takeSnapshot() {
+      const video = document.getElementById('videoElement');
+      const canvas = document.getElementById('canvasElement');
+      const preview = document.getElementById('imagePreview');
+      const btnSnap = document.getElementById('btn-snap');
+      const btnRetake = document.getElementById('btn-retake');
+      const checkIcon = document.getElementById('check-icon-success');
+
+      const ctx = canvas.getContext('2d');
+      canvas.width = 640;
+      canvas.height = 480;
+      
+      ctx.translate(640, 0);
+      ctx.scale(-1, 1);
+      ctx.drawImage(video, 0, 0, 640, 480);
+      
+      base64PhotoData = canvas.toDataURL('image/jpeg', 0.85);
+      preview.src = base64PhotoData;
+      
+      stopWebcam();
+      
+      video.classList.add('hidden');
+      preview.classList.remove('hidden');
+      checkIcon.classList.remove('hidden');
+      
+      btnSnap.classList.add('hidden');
+      btnRetake.classList.remove('hidden');
+    }
+
+    function ulangFoto() {
+      base64PhotoData = "";
+      document.getElementById('check-icon-success').classList.add('hidden');
+      startWebcam();
+    }
+
+    function stopWebcam() {
+      if (activeStream) {
+        activeStream.getTracks().forEach(track => track.stop());
+        activeStream = null;
+      }
+      const video = document.getElementById('videoElement');
+      video.srcObject = null;
+    }
+
+    // ==========================================
+    // LOGIC SUBMIT FORM BUKU TAMU
+    // ==========================================
+    function handleFormSubmit(e) {
+      e.preventDefault();
+
+      if (!base64PhotoData) {
+        showNotification("Foto Wajib Diambil", "Silakan klik aktifkan kamera dan ambil foto pengunjung terlebih dahulu.", "error");
+        return;
+      }
+
+      const btnSubmit = document.getElementById('btn-submit');
+      const submitText = document.getElementById('submit-text');
+
+      btnSubmit.disabled = true;
+      btnSubmit.classList.add('opacity-50', 'cursor-not-allowed');
+      submitText.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i>Sedang Menyimpan Data...`;
+
+      let pegawaiDipilih = "-";
+      if (document.getElementById('kategori').value === "Tamu") {
+        const radios = document.getElementsByName('pegawai_tujuan');
+        for (let i = 0; i < radios.length; i++) {
+          if (radios[i].checked) {
+            pegawaiDipilih = radios[i].value;
+            break;
+          }
+        }
+      }
+
+      const payload = {
+        nama: document.getElementById('nama').value,
+        noHp: document.getElementById('noHp').value,
+        asalTamu: document.getElementById('asalTamu').value,
+        keperluan: document.getElementById('keperluan').value,
+        kategori: document.getElementById('kategori').value,
+        pegawai: pegawaiDipilih,
+        foto: base64PhotoData
+      };
+
+      callBackendAPI(
+        "simpanDataTamu",
+        payload,
+        function(response) {
+          btnSubmit.disabled = false;
+          btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+          submitText.innerHTML = `<i class="fa-solid fa-paper-plane mr-2"></i>Simpan & Daftarkan Kehadiran`;
+
+          if (response.success) {
+            showNotification("Berhasil Disimpan", response.message, "success");
+            
+            document.getElementById('guestForm').reset();
+            base64PhotoData = "";
+            document.getElementById('imagePreview').src = "https://placehold.co/640x480?text=Kamera+Belum+Aktif";
+            document.getElementById('check-icon-success').classList.add('hidden');
+            document.getElementById('container-pegawai').classList.add('hidden');
+            document.getElementById('btn-start-camera').classList.remove('hidden');
+            document.getElementById('btn-retake').classList.add('hidden');
+
+            ambilDataTerbaru();
+            setTimeout(() => {
+              pindahTab('dashboard');
+            }, 1000);
+          } else {
+            showNotification("Gagal Menyimpan", response.message, "error");
+          }
+        },
+        function(err) {
+          btnSubmit.disabled = false;
+          btnSubmit.classList.remove('opacity-50', 'cursor-not-allowed');
+          submitText.innerHTML = `<i class="fa-solid fa-paper-plane mr-2"></i>Simpan & Daftarkan Kehadiran`;
+          showNotification("Error Jaringan", err.toString(), "error");
+        }
+      );
+    }
+
+    // ==========================================
+    // DATA FETCHING & POPULASI UI
+    // ==========================================
+    function ambilDataTerbaru() {
+      callBackendAPI(
+        "getStatistikDanRekap",
+        null,
+        function(data) {
+          if (data.success) {
+            dataCache = data.daftarTamu;
+            
+            document.getElementById('stat-total').innerText = data.totalTamu;
+            document.getElementById('stat-hari-ini').innerText = data.tamuHariIni;
+
+            const containerKategori = document.getElementById('container-stat-kategori');
+            containerKategori.innerHTML = "";
+            
+            const listKategori = [
+              { nama: "Pihak Berperkara", icon: "fa-scale-balanced", color: "text-emerald-600 bg-emerald-50" },
+              { nama: "Kuasa Hukum", icon: "fa-gavel", color: "text-blue-600 bg-blue-50" },
+              { nama: "Saksi", icon: "fa-users-line", color: "text-indigo-600 bg-indigo-50" },
+              { nama: "Pencari Informasi", icon: "fa-circle-info", color: "text-sky-600 bg-sky-50" },
+              { nama: "Pengambilan Produk PA", icon: "fa-box-open", color: "text-amber-600 bg-amber-50" },
+              { nama: "Tamu Dinas", icon: "fa-user-tie", color: "text-purple-600 bg-purple-50" },
+              { nama: "Lainnya", icon: "fa-ellipsis", color: "text-slate-500 bg-slate-100" }
+            ];
+
+            listKategori.forEach(function(item) {
+              const count = data.statsKategori[item.nama] || 0;
+              containerKategori.innerHTML += `
+                <div class="bg-slate-50 p-4 rounded-2xl border border-slate-100 flex flex-col items-center justify-center text-center transition hover:shadow-sm">
+                  <div class="w-10 h-10 rounded-xl ${item.color} flex items-center justify-center text-lg mb-2">
+                    <i class="fa-solid ${item.icon}"></i>
+                  </div>
+                  <h4 class="text-[10px] font-bold text-slate-400 uppercase tracking-wider leading-none">${item.nama}</h4>
+                  <p class="text-2xl font-black text-slate-800 mt-1">${count}</p>
+                </div>
+              `;
+            });
+
+            tampilkanDataTamu(dataCache);
+          } else {
+            showNotification("Sistem Error", "Gagal memuat statistik database.", "error");
+          }
+        },
+        function(err) {
+          showNotification("Gagal Memuat Data", err.toString(), "error");
+        }
+      );
+    }
+
+    function tampilkanDataTamu(tamuList) {
+      const tbody = document.getElementById('tabel-rekap-body');
+      tbody.innerHTML = "";
+
+      if (tamuList.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="8" class="px-6 py-12 text-center text-slate-400 font-medium">
+              <i class="fa-solid fa-folder-open text-4xl mb-2 block text-slate-300"></i>
+              Belum ada riwayat pendaftaran tamu.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      tamuList.forEach(function(tamu) {
+        let tagFoto = "-";
+        if (tamu.fotoUrl && tamu.fotoUrl !== "-") {
+          tagFoto = `
+            <a href="${tamu.fotoUrl}" target="_blank" class="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-paGreen-50 hover:bg-paGreen-100 text-paGreen-800 rounded-lg text-xs font-bold transition">
+              <i class="fa-solid fa-image"></i>
+              <span>Buka Foto</span>
+            </a>
+          `;
+        }
+
+        tbody.innerHTML += `
+          <tr class="hover:bg-slate-50/50 transition">
+            <td class="px-6 py-4 whitespace-nowrap text-slate-500 font-semibold text-xs">${tamu.waktu}</td>
+            <td class="px-6 py-4 text-slate-900 font-bold">${tamu.nama}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-block px-2.5 py-1 rounded-full text-xs font-bold bg-slate-100 text-slate-700 border border-slate-200/50">
+                ${tamu.kategori}
+              </span>
+            </td>
+            <td class="px-6 py-4 text-slate-600 font-medium">${tamu.asalTamu || "-"}</td>
+            <td class="px-6 py-4 text-slate-600 font-medium">${tamu.keperluan || "-"}</td>
+            <td class="px-6 py-4 text-slate-600 font-medium">${tamu.pegawaiDituju}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-slate-700 font-mono text-xs">${tamu.noHp}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">${tagFoto}</td>
+          </tr>
+        `;
+      });
+    }
+
+    /**
+     * Fitur Pencarian Real-Time Client Side
+     */
+    function filterDataTamu(keyword) {
+      const keyClean = keyword.toLowerCase().trim();
+      const filtered = dataCache.filter(function(tamu) {
+        return tamu.nama.toLowerCase().includes(keyClean) || 
+               tamu.noHp.includes(keyClean) || 
+               (tamu.asalTamu && tamu.asalTamu.toLowerCase().includes(keyClean)) ||
+               (tamu.keperluan && tamu.keperluan.toLowerCase().includes(keyClean));
+      });
+      tampilkanDataTamu(filtered);
+    }
+
+    /**
+     * Download format CSV (Sesuai dengan rule clipboard/no download alert)
+     */
+    function downloadFormatCSV() {
+      if (dataCache.length === 0) {
+        showNotification("Data Kosong", "Belum ada data riwayat kunjungan yang dapat diunduh.", "error");
+        return;
+      }
+
+      let csvContent = "\uFEFF"; // BOM untuk kompatibilitas Microsoft Excel (karakter utf-8 lokal)
+      csvContent += "Waktu Kunjungan,Nama Pengunjung,Kategori,Asal Tamu,Keperluan,Tujuan Pegawai,Nomor HP/WA,Link File Foto\n";
+
+      dataCache.forEach(function(row) {
+        const safeNama = `"${row.nama.replace(/"/g, '""')}"`;
+        const safeKategori = `"${row.kategori.replace(/"/g, '""')}"`;
+        const safeAsal = `"${(row.asalTamu || "").replace(/"/g, '""')}"`;
+        const safeKeperluan = `"${(row.keperluan || "").replace(/"/g, '""')}"`;
+        const safePegawai = `"${row.pegawaiDituju.replace(/"/g, '""')}"`;
+        
+        csvContent += `${row.waktu},${safeNama},${safeKategori},${safeAsal},${safeKeperluan},${safePegawai},'${row.noHp},${row.fotoUrl}\n`;
+      });
+
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
+      const tempLink = document.createElement("a");
+      tempLink.setAttribute("href", url);
+      tempLink.setAttribute("download", "Rekap_Buku_Tamu_PA_Bengkalis.csv");
+      document.body.appendChild(tempLink);
+      tempLink.click();
+      document.body.removeChild(tempLink);
+      
+      showNotification("Selesai Mengunduh", "File Excel CSV berhasil disimpan di perangkat Anda.", "success");
+    }
+
+    // ==========================================
+    // NOTIFIKASI TOAST CUSTOM (Tidak memakai Alert)
+    // ==========================================
+    function showNotification(title, message, type) {
+      const toast = document.getElementById('notif-toast');
+      const iconBg = document.getElementById('toast-icon-bg');
+      const icon = document.getElementById('toast-icon');
+      
+      document.getElementById('toast-title').innerText = title;
+      document.getElementById('toast-msg').innerText = message;
+
+      if (type === "success") {
+        iconBg.className = "p-2.5 rounded-xl text-white bg-emerald-500 shadow-md shadow-emerald-500/20";
+        icon.className = "fa-solid fa-circle-check";
+      } else {
+        iconBg.className = "p-2.5 rounded-xl text-white bg-rose-500 shadow-md shadow-rose-500/20";
+        icon.className = "fa-solid fa-triangle-exclamation";
+      }
+
+      toast.classList.remove('translate-y-20', 'opacity-0', 'pointer-events-none');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(function() {
+        toast.classList.add('translate-y-20', 'opacity-0', 'pointer-events-none');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 5000);
+    }
+  </script>
+</body>
+</html>
